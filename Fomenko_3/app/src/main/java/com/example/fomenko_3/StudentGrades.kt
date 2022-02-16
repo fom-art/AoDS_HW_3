@@ -1,6 +1,6 @@
 package com.example.fomenko_3
 
-class StudentGrades(private var gradeslist: MutableList<Number>) {
+class StudentGrades <T : Number>(private var gradeslist: MutableList<T>) {
 
     private var isChanged = true
     private var maxGrade = getMaxGrade()
@@ -13,9 +13,9 @@ class StudentGrades(private var gradeslist: MutableList<Number>) {
     private var satisfactorilyAmount = getSatisfactorilyAmount()
 
 
-    private lateinit var a: MutableList<Number>
+    private lateinit var a: MutableList<T>
 
-    operator fun get(i: Int): Number {
+    operator fun get(i: Int): T {
         return a[i]
     }
 
@@ -31,16 +31,18 @@ class StudentGrades(private var gradeslist: MutableList<Number>) {
         isChanged = false
     }
 
-    fun getGrades(): MutableList<Number> {
+    fun getGrades(): MutableList<T> {
         return gradeslist
     }
 
-    fun setGrades(newGradesList: MutableList<Number>) {
+    fun setGrades(newGradesList: MutableList<T>) {
         var isLeagal = true
         for (grades in newGradesList) {
-            if (grades !in 0..100){
-                throw IllegalArgumentException("Grades must be in range from 0 to 100")
-                isLeagal = false
+            if (grades.toInt() !in 0..100){
+                if(grades.toDouble() > 100){
+                    throw IllegalArgumentException("Grades must be in range from 0 to 100")
+                    isLeagal = false
+                }
             }
         }
         if (isLeagal) {
@@ -50,21 +52,25 @@ class StudentGrades(private var gradeslist: MutableList<Number>) {
         }
     }
 
-    fun addGrades(grade: Number) {
-        if (grade in 0..100) {
-            gradeslist.add(grade)
-            isChanged = true
-            updateData()
+    fun addGrades(grade: T) {
+        if (grade.toInt() in 0..100) {
+            if (grade.toDouble() < 100) {
+                gradeslist.add(grade)
+                isChanged = true
+                updateData()
+            } else {
+                throw IllegalArgumentException("Grades must be in range from 0 to 100")
+            }
         } else {
             throw IllegalArgumentException("Grades must be in range from 0 to 100")
         }
     }
 
-    fun getMaxGrade(): Number {
+    fun getMaxGrade(): T {
         if (!isChanged){
             return maxGrade
         }
-        var max: Number = gradeslist[0].toDouble()
+        var max: T = gradeslist[0]
         for (grades in gradeslist) {
             if (grades.toDouble() > max.toDouble()){
                 max = grades
@@ -73,11 +79,11 @@ class StudentGrades(private var gradeslist: MutableList<Number>) {
         return max
     }
 
-    fun getMinGrade(): Number {
+    fun getMinGrade(): T {
         if (!isChanged){
             return minGrade
         }
-        var min: Number = gradeslist[0]
+        var min: T = gradeslist[0]
         for (grades in gradeslist) {
             if (grades.toDouble() < min.toDouble()){
                 min = grades
@@ -99,34 +105,28 @@ class StudentGrades(private var gradeslist: MutableList<Number>) {
         return averageGrade
     }
 
-    fun getLessThanAverage(): MutableList<Number> {
+    fun getLessThanAverage(): MutableList<T> {
         if (!isChanged){
             return lessThanAverage
         }
-        val resultList: MutableList<Number> = mutableListOf()
+        val resultList: MutableList<T> = mutableListOf()
         for (grade in gradeslist) {
             if (grade.toDouble() < averageGrade) {
                 resultList.add(grade)
             }
         }
-        if (resultList.isEmpty()) {
-            return mutableListOf(-1)
-        }
         return resultList
     }
 
-    fun getGreaterThanAverage(): MutableList<Number> {
+    fun getGreaterThanAverage(): MutableList<T> {
         if (!isChanged){
             return greaterThanAverage
         }
-        val resultList: MutableList<Number> = mutableListOf()
+        val resultList: MutableList<T> = mutableListOf()
         for (grade in gradeslist) {
             if (grade.toDouble() > averageGrade) {
                 resultList.add(grade)
             }
-        }
-        if (resultList.isEmpty()) {
-            return mutableListOf(-1)
         }
         return resultList
     }
